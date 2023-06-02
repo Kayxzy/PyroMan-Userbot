@@ -13,7 +13,7 @@ from pyrogram import Client, enums, filters
 from pyrogram.raw import functions
 from pyrogram.types import Message
 
-from config import CMD_HANDLER as cmd
+ config import CMD_HANDLER as cmd
 from ProjectMan.helpers.PyroHelpers import ReplyCheck
 
 from .help import add_command_help
@@ -35,7 +35,7 @@ commands = {
 
 
 @Client.on_message(filters.command(list(commands), cmd) & filters.me)
-async def fakeactions_handler(client: Client, message: Message):
+async def fakeactions_handler(client, message: Message):
     cmd = message.command[0]
     try:
         sec = int(message.command[1])
