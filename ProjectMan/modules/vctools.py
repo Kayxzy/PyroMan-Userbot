@@ -27,7 +27,7 @@ from ProjectMan.helpers.tools import get_arg
 from .help import add_command_help
 
 
-async def get_group_call(
+async def group_call(
     client: Client, message: Message, err_msg: str = ""
 ) -> Optional[InputGroupCall]:
     chat_peer = await client.resolve_peer(message.chat.id)
