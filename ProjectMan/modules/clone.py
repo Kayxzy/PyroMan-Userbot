@@ -21,28 +21,52 @@ OWNER = os.environ.get("OWNER", None)
 BIO = os.environ.get("BIO", "404 : Bio Lost")
 
 
-@Client.on_message(filters.command("clone", cmd) & filters.me)
+def get_user(message, text):
+    # Implement your logic to extract the user ID from the message and text
+    # This is a placeholder implementation; adjust as needed
+    if text:
+        # Example: assuming the user ID is mentioned in the text
+        user_id = text.split()[1]  # Adjust this logic based on your command structure
+        return user_id
+    return None
+
+
+@ubot.on_message(filters.command("clone", PREFIX) & filters.me)
 async def clone(client: Client, message: Message):
-    text = get_text(message)
+    text = get_text(message)  # Assuming this function extracts the text from the message
     op = await edit_or_reply(message, "`Cloning`")
-    userk = get_user(message, text)[0]
-    user_ = await client.get_users(userk)
+    
+    # Extract user ID from the message text
+    userk = get_user(message, text)  # Assuming get_user returns a user ID or None
+    if not userk:
+        await op.edit("`Whom should I clone?`")
+        return
+
+    try:
+        user_ = await client.get_users(userk)
+    except Exception as e:
+        await op.edit("`Error fetching user.`")
+        return
+
     if not user_:
-        await op.edit("`Whom i should clone:(`")
+        await op.edit("`Whom should I clone?`")
         return
 
     get_bio = await client.get_chat(user_.id)
     f_name = user_.first_name
-    c_bio = get_bio.bio
-    pic = user_.photo.big_file_id
-    poto = await client.download_media(pic)
+    c_bio = get_bio.bio if get_bio.bio else "No bio available."  # Handle case where bio might be None
+    pic = user_.photo.big_file_id if user_.photo else None  # Check if user has a photo
 
-    await client.set_profile_photo(photo=poto)
+    if pic:
+        poto = await client.download_media(pic)
+        await client.set_profile_photo(photo=poto)
+
     await client.update_profile(
         first_name=f_name,
         bio=c_bio,
     )
     await message.edit(f"**From now I'm** __{f_name}__")
+
 
 
 @Client.on_message(filters.command("revert", cmd) & filters.me)
